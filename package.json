@@ -1,0 +1,15 @@
+{
+  "name": "Class",
+  "version": "0.0.0",
+  "description": "Implement CoffeeScript's Class System",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "author": "",
+  "license": "BSD",
+  "devDependencies": {
+    "chai": "~1.9.1",
+    "mocha": "~1.18.2"
+  }
+}
