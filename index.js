@@ -1,54 +1,52 @@
 #!/usr/bin/env node
 
 function Class(input, superClass){
-  var obj;  
+  var constructor;  
   if(input.initialize){
-    obj = function(){
+    constructor = function(){
       input.initialize.apply(this, [].slice.call(arguments,0));
     }
   }
   else{
-    obj = function(){}
+    constructor = function(){}
   }
 
   function ctor() {
-    this.constructor = obj;
+    this.constructor = constructor;
   }
 
-  obj.prototype = new ctor();
-  //obj.prototype.constructor = obj;
+  constructor.prototype = new ctor();
 
+  if(superClass){
+    constructor.__super__ = superClass;
+    ctor.prototype = superClass.prototype
+  }
+  else{
+    constructor.__super__ = Object;
+    ctor.prototype = Object.prototype;
+  }
 
   if(superClass){
     for(var key in superClass.prototype){
-      //console.log(key);
       if(key!='constructor'){
-        obj.prototype[key] = superClass.prototype[key];
+        constructor.prototype[key] = superClass.prototype[key];
       }
     }
   }
 
-  if(superClass){
-    obj.__super__ = superClass;
-    ctor.prototype = new superClass();
-  }
-  else{
-    obj.__super__ = Object;
-    ctor.prototype = new Object();
-  }
 
   ctor.prototype.constructor = ctor;
  
   for(var key in input){
     if(key != "initialize"){
-      obj.prototype[key] = input[key]; 
+      constructor.prototype[key] = input[key]; 
     }
   }
   
-  var current_class = obj;
+  var current_class = constructor;
   var count = 0;
 
-  obj.prototype.super = function(name){
+  constructor.prototype.super = function(name){
     parent = current_class.__super__;
     if(name){
       current_class = current_class.__super__;
@@ -56,14 +54,14 @@ function Class(input, superClass){
       result = parent.prototype[name].apply(this, [].slice.call(arguments,1));
       count = count - 1;
       if(count==0){
-        current_class = obj;
+        current_class = constructor;
       }
       //console.log(result);
       return result;
     }
   };
 
-  return obj;
+  return constructor;
 }
 
 module.exports = Class;
